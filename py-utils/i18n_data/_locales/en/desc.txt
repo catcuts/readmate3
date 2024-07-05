@@ -1,0 +1,3 @@
+what is?
+
+This is a template plugin to help people quickly develop their own chrome plugins

@@ -1,0 +1,13 @@
+{
+  "env": {
+    "__DEV__": "true"
+  },
+  "watch": [
+    "src", "utils", "vite.config.js"
+  ],
+  "ext": "jsx,css,html,js,json",
+  "ignore": [
+    "src/**/*.spec.js"
+  ],
+  "exec": "vite build"
+}
