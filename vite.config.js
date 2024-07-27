@@ -5,24 +5,35 @@ import makeManifest from './utils/plugins/make-manifest';
 import buildContentScript from './utils/plugins/build-content-script';
 import { outputFolderName } from './utils/constants';
 import copyI18n from './utils/plugins/copy-i18n';
+import alias from '@rollup/plugin-alias';
+import svgr from "vite-plugin-svgr";
+import { pwd, srcDir, pagesDir, assetsDir, publicDir } from './alias.config';
 
-
-const root = resolve(__dirname, 'src');
-const pagesDir = resolve(root, 'pages');
-const assetsDir = resolve(root, 'assets');
-const outDir = resolve(__dirname, outputFolderName);
-const publicDir = resolve(__dirname, 'public');
+const outDir = resolve(pwd, outputFolderName);
 
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
     alias: {
-      '@src': root,
+      '@src': srcDir,
       '@assets': assetsDir,
       '@pages': pagesDir,
     },
   },
-  plugins: [react(), makeManifest(), buildContentScript(), copyI18n()],
+  plugins: [
+    alias({
+      entries: {
+        '@src': srcDir,
+        '@assets': assetsDir,
+        '@pages': pagesDir,
+      },
+    }),
+    // svgr(),
+    react(),
+    makeManifest(),
+    buildContentScript(),
+    copyI18n(),
+  ],
   publicDir,
   build: {
     outDir,
