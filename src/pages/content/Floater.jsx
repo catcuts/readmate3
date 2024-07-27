@@ -48,15 +48,17 @@ const Floater = ({
     }
   };
 
-  const handleMouseClickOnCloseFlag = () => {
-    console.log('handleMouseClickOnCloseFlag');
+  const handleMouseDownOnCloseFlag = (e) => {
+    e.stopPropagation(); // 阻止事件冒泡，确保不被 Draggable 捕获
+  };
+  
+  const handleMouseUpOnCloseFlag = (e) => {
     // 点击关闭，头像进入隐藏状态
     setStatus('hidden');
     eventEmitter.emit('FloaterHidden');
   };
 
   const handleStartDragAvatar = () => {
-    console.log('handleStartDragAvatar');
     // 开始拖动，头像进入拖动状态
     setIsDragging(true);
   };
@@ -124,7 +126,8 @@ const Floater = ({
                 backgroundSize: 'cover',
                 cursor: 'pointer',
               }}
-              onClick={handleMouseClickOnCloseFlag}
+              onMouseDown={handleMouseDownOnCloseFlag}
+              onMouseUp={handleMouseUpOnCloseFlag}
             />
           )}
         </div>
