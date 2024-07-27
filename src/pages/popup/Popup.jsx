@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import LoginButton from '../../compoents/LoginButton';
-import { getCurrentUser } from '../../compoents/supabaseClient';
+import LoginButton from '../../components/LoginButton';
+import { getCurrentUser } from '../../components/supabaseClient';
 import Pricing from './Pricing';
 
 export default function Popup() {

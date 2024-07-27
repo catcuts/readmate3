@@ -1,4 +1,4 @@
-import { getSupabaseAuthInfo } from "../../compoents/supabaseClient"
+import { getSupabaseAuthInfo } from "../../components/supabaseClient"
 
 export default function Pricing() {
 
