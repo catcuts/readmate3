@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" width="1em" height="1em"
+  fill="currentColor" aria-hidden="true" focusable="false" class="">
+  <path fill="currentColor" fill-rule="nonzero"
+    d="M6 .75a5.25 5.25 0 1 1 0 10.5A5.25 5.25 0 0 1 6 .75m2.066 3.184a.47.47 0 0 0-.663 0l-1.39 1.389-1.367-1.387a.469.469 0 0 0-.677.649l.01.01 1.372 1.39-1.427 1.428a.469.469 0 0 0 .673.653L6.01 6.653l1.39 1.41a.469.469 0 0 0 .677-.648l-.01-.01L6.672 5.99l1.404-1.403a.47.47 0 0 0-.01-.653"
+    opacity="0.3">
+  </path>
+</svg>

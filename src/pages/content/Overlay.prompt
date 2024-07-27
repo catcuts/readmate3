@@ -1,0 +1,7 @@
+请使用 React + Tailwind 编写一个 React 组件，名叫“Overlay”，我的需求是：
+
+1. 这个 Overlay 组件的参数有：
+    - `visible`：是否显示 Overlay，类型为 `boolean`，默认值为 `false`；
+    - `onClose`：点击关闭按钮时的回调函数，类型为 `() => void`，默认值为 `() => {}`；
+    - `children`：Overlay 的内容，类型为 `ReactNode`，默认值为 `null`；
+2. 这个 Overlay 组件载入后呈现为一个全透明的、覆盖整个窗口的浮层，内容居中显示。
