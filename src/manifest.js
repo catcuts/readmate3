@@ -26,18 +26,18 @@ const manifest = {
     'tabs',
     "storage",
   ],
-  // content_scripts: [
-  //   {
-  //     matches: ['http://*/*', 'https://*/*', '<all_urls>'],
-  //     js: ['src/pages/content/index.js'],
-  //     css: ['contentStyle.css'],
-  //   },
-  // ],
+  content_scripts: [
+    {
+      matches: ['http://*/*', 'https://*/*', '<all_urls>'],
+      js: ['src/pages/content/index.js'],
+      css: ['contentStyle.css'],
+    },
+  ],
   devtools_page: 'src/pages/devtools/index.html',
   web_accessible_resources: [
     {
-      resources: ['contentStyle.css', 'icon-128.png', 'icon-34.png'],
-      matches: [],
+      resources: ['contentStyle.css', 'icon-128.png', 'icon-34.png', 'assets/*'],
+      matches: ["<all_urls>"]
     },
   ],
   default_locale: "en"
