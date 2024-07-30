@@ -18,17 +18,21 @@ const Floater = ({
   initY = '50%',
 }) => {
 
+  // 使用 localStorage 来存储和获取初始高度。注意：localStorage 存储的是字符串，所以需要转换为数字。
+  const storedInitY = Number(localStorage.getItem('floaterInitY'));
+  let usingInitY = storedInitY || initY;
+
   if (typeof initX === 'string' && initX.endsWith('%')) {
     initX = window.innerWidth * (parseInt(initX) / 100) - parseInt(width);
   }
-  if (typeof initY === 'string' && initY.endsWith('%')) {
-    initY = window.innerHeight * (parseInt(initY) / 100) - parseInt(height);
+  if (typeof usingInitY === 'string' && usingInitY.endsWith('%')) {
+    usingInitY = window.innerHeight * (parseInt(usingInitY) / 100) - parseInt(usingInitY);
   }
 
-  console.log(`initX: ${initX}, initY: ${initY}`);
+  console.log(`initX: ${initX}, initY: ${usingInitY}`);
 
   const [status, setStatus] = useState('standby');
-  const [position, setPosition] = useState({ x: initX, y: initY });
+  const [position, setPosition] = useState({ x: initX, y: usingInitY });
   const [isDragging, setIsDragging] = useState(false);
   const [isDocking, setIsDocking] = useState(initX >= 0);
 
@@ -87,6 +91,9 @@ const Floater = ({
 
     // 停止拖动，头像进入待命状态
     setStatus('standby');
+
+    // 记录当前的高度到 localStorage
+    localStorage.setItem('floaterInitY', newPosition.y);
   };
 
   const backgroundImageUrl = status === 'standby' ? avatarOnStandby : avatar;
