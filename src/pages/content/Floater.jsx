@@ -230,6 +230,8 @@ const Floater = ({
             right: isDocking && (status === 'standby') ? `-${parseInt(width) / 2}px` : '0',
             transition: 'right 0.3s ease-in-out',
           }}
+          onMouseEnter={handleMouseEnterIntoAvatar}
+          onMouseLeave={handleMouseLeaveFromAvatar}
         >
           <div  // Avatar
             style={{
@@ -241,8 +243,6 @@ const Floater = ({
               cursor: 'pointer',
               transition: 'opacity 0.3s ease-in-out',
             }}
-            onMouseEnter={handleMouseEnterIntoAvatar}
-            onMouseLeave={handleMouseLeaveFromAvatar}
             onClick={handleAvatarClick}
           >
             {status === 'active' && (
@@ -358,8 +358,8 @@ const Floater = ({
                   ref={messageInputRef}
                   value={message}
                   onChange={handleMessageChange}
-                  className="font-sans text-base p-2 rounded-lg resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
-                  style={{ width: '99%', minHeight: '2.5em', maxHeight: '150px' }}
+                  className="text-base p-2 rounded-lg resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
+                  style={{ width: '99%', minHeight: '2.5em', maxHeight: '150px', border: 'none' }}
                   placeholder="向我提问"
                 />
                 <div className="flex justify-between items-center p-2">
