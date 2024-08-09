@@ -1,0 +1,14 @@
+请使用 React + Tailwind 编写一个 React 组件，名叫“Bubble”，一个漫画中常见的气泡对话框形状的容器组件，我的需求是：
+
+1. 这个 Bubble 组件的参数有：
+    - `children`：React 组件的子元素，用于显示对话桩内容
+    - `visible`：对话框的可见性，可选值有 `true`、`false`，默认值为 `true`
+    - `position`：对话框的位置，是一个对象，包含 x 和 y 两个属性，分别表示对话框的水平位置和垂直位置，单位是像素，默认值为 `{ x: 0, y: 0 }`
+    - `direction`：对话框的尖角方向，可选值有 `top`、`right`、`bottom`、`left`，默认值为 `top`
+    - `color`：对话框的背景颜色，可选值有 `red`、`green`、`blue`，默认值为 `red`
+    - `width`：对话框的宽度，可选值有 `small`、`medium`、`large`，默认值为 `medium`
+    - `height`：对话框的高度，可选值有 `small`、`medium`、`large`，默认值为 `medium`
+    - `fontSize`：对话框的字体大小，可选值有 `small`、`medium`、`large`，默认值为 `medium`
+    - `borderRadius`：对话框的圆角大小，可选值有 `small`、`medium`、`large`，默认值为 `medium`
+    - `padding`：对话框的内边距大小，可选值有 `small`、`medium`、`large`，默认值为 `medium`
+    - `margin`：对话框的外边距大小，可选值有 `small`、`medium`、`large`，默认值为 `medium`
