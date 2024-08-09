@@ -44,6 +44,8 @@ const Floater = ({
   const [message, setMessage] = useState('');
   const [isBubblePinned, setIsBubblePinned] = useState(false); // 新增状态，用于控制Bubble是否定住
   const [hasDragged, setHasDragged] = useState(false); // 新增状态，用于跟踪是否发生了拖拽
+  const bubbleContentRef = useRef(null);
+  const pageSummaryRef = useRef(null);
   const fileInputRef = useRef(null);
   const messageInputRef = useRef(null);
   const fileContainerRef = useRef(null);
@@ -60,9 +62,8 @@ const Floater = ({
   }, [status, selectedFiles]);
 
   const updateBubbleHeight = () => {
-    if (fileContainerRef.current) {
-      const fileContainerHeight = fileContainerRef.current.offsetHeight;
-      setBubbleHeight(290 + Math.max(0, fileContainerHeight - 60)); // 基础高度290px，加上文件容器超出60px的部分
+    if (bubbleContentRef.current) {
+      setBubbleHeight(bubbleContentRef.current.offsetHeight);
     }
   };
 
@@ -278,8 +279,14 @@ const Floater = ({
             }}
           >
             {/* 更新后的内容 */}
-            <div className="p-4 flex flex-col space-y-4">
-              <div className="flex items-center justify-between p-2 bg-gray-100 rounded-lg">
+            <div
+              ref={bubbleContentRef} 
+              className="p-4 flex flex-col space-y-4"
+            >
+              <div 
+                ref={pageSummaryRef}
+                className="flex items-center justify-between p-2 bg-gray-100 rounded-lg"
+              >
                 <div className="flex-1 mr-2 overflow-hidden">
                   <div className="font-bold text-sm whitespace-nowrap overflow-hidden text-overflow-ellipsis">
                     {document.title || '未命名页面'}
@@ -351,7 +358,7 @@ const Floater = ({
                   ref={messageInputRef}
                   value={message}
                   onChange={handleMessageChange}
-                  className="font-sans text-base p-2 rounded-lg resize-none overflow-y-auto border-none ring-0 outline-none focus:border-none focus:ring-0 focus:outline-none"
+                  className="font-sans text-base p-2 rounded-lg resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
                   style={{ width: '99%', minHeight: '2.5em', maxHeight: '150px' }}
                   placeholder="向我提问"
                 />
