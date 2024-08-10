@@ -32,8 +32,6 @@ const Floater = ({
     usingInitY = window.innerHeight * (parseInt(usingInitY) / 100) - parseInt(usingInitY);
   }
 
-  console.log(`initX: ${initX}, initY: ${usingInitY}`);
-
   const [status, setStatus] = useState('standby');
   const [position, setPosition] = useState({ x: initX, y: usingInitY });
   const [isDragging, setIsDragging] = useState(false);
@@ -44,6 +42,9 @@ const Floater = ({
   const [message, setMessage] = useState('');
   const [isBubblePinned, setIsBubblePinned] = useState(false); // 新增状态，用于控制Bubble是否定住
   const [hasDragged, setHasDragged] = useState(false); // 新增状态，用于跟踪是否发生了拖拽
+  const [isAutoCloseDisabled, setIsAutoCloseDisabled] = useState(false); // 新增状态，用于控制是否暂时停用自动收起
+  const avatarRef = useRef(null);
+  const bubbleRef = useRef(null);
   const bubbleContentRef = useRef(null);
   const pageSummaryRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -59,7 +60,7 @@ const Floater = ({
       setBubbleHeight(0); // 隐藏时设置 Bubble 高度为 0，触发动画效果
       setBubbleOpacity(0); // 隐藏时设置 Bubble 透明度为 0，触发动画效果
     }
-  }, [status, selectedFiles]);
+  }, [status, selectedFiles/*Bubble高度要随文件列表而变化*/]);
 
   const updateBubbleHeight = () => {
     if (bubbleContentRef.current) {
@@ -67,17 +68,28 @@ const Floater = ({
     }
   };
 
-  const handleMouseEnterIntoAvatar = () => {
-    if (status !== 'hidden') {
+  const handleMouseEnterIntoAvatar = (e) => {
+    // console.log(`handleMouseEnterIntoAvatar`, e);
+    if (status !== 'hidden' && status !== 'active') {
+      // 注：这里 多了一个 status !== 'active' 的判断，
+      //     这是因为偶现当鼠标移入Bubble再选择文件后，
+      //     尽管鼠标在Bubble之外，也会触发一个鼠标移入事件，
+      //     原因未知，暂时通过这个判断来避免这个问题。
       // 鼠标进入头像区域，头像进入激活状态
       setStatus('active');
       eventEmitter.emit('FloaterActivated');
+      setIsAutoCloseDisabled(false); // 重新启用自动收起
     }
   };
 
   const handleMouseLeaveFromAvatar = () => {
-    if (status !== 'hidden' && !isDragging && !isBubblePinned) {
-      // 鼠标离开头像区域，如果Bubble没有定住，头像回到待命状态
+    // console.log(`handleMouseLeaveFromAvatar:` + 
+    //   `isDragging: ${isDragging}, ` +
+    //   `isBubblePinned: ${isBubblePinned}, ` +
+    //   `isAutoCloseDisabled: ${isAutoCloseDisabled}`
+    // );
+    if (status !== 'hidden' && !isDragging && !isBubblePinned && !isAutoCloseDisabled) {
+      // 鼠标离开头像区域，如果Bubble没有定住且自动收起未被禁用，头像回到待命状态
       setStatus('standby');
       eventEmitter.emit('FloaterStandby');
     }
@@ -156,8 +168,6 @@ const Floater = ({
   const backgroundImageUrl = status === 'standby' ? avatarOnStandby : avatar;
   const backgroundImage = /^https?:\/\//.test(backgroundImageUrl) ? backgroundImageUrl : chrome.runtime.getURL(backgroundImageUrl);
 
-  console.log(`isDocking: ${isDocking}`);
-
   const bubblePosition = { x: 100, y: 100 };
 
   // 新增的处理函数
@@ -167,8 +177,11 @@ const Floater = ({
   };
 
   const handleFileUpload = (event) => {
+    // console.log('handleFileUpload');
     const newFiles = Array.from(event.target.files || event.dataTransfer.files);
     setSelectedFiles(prevFiles => [...prevFiles, ...newFiles]);
+    setIsAutoCloseDisabled(true); // 禁用自动收起
+    // console.log('handleFileUpload - isAutoCloseDisabled:', isAutoCloseDisabled);
   };
 
   const handleRemoveFile = (index) => {
@@ -187,6 +200,9 @@ const Floater = ({
   };
 
   const handleClickFileInput = () => {
+    // console.log('handleClickFileInput');
+    setIsAutoCloseDisabled(true); // 禁用自动收起
+    // console.log('handleClickFileInput - isAutoCloseDisabled:', isAutoCloseDisabled);
     fileInputRef.current.click();
   };
 
@@ -234,6 +250,7 @@ const Floater = ({
           onMouseLeave={handleMouseLeaveFromAvatar}
         >
           <div  // Avatar
+            ref={avatarRef}
             style={{
               height,
               width,
@@ -259,6 +276,7 @@ const Floater = ({
             )}
           </div>
           <Bubble
+            ref={bubbleRef}
             position={bubblePosition}
             style={{
               position: 'absolute',
