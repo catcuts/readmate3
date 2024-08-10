@@ -54,8 +54,8 @@ const Bubble = ({
     ...angleBackgroundStyle,
   };
 
-  console.log(`backgroundStyle: ${JSON.stringify(boxStyle)}`);
-  console.log(`angleStyle: ${JSON.stringify(angleStyle)}`);
+  // console.log(`backgroundStyle: ${JSON.stringify(boxStyle)}`);
+  // console.log(`angleStyle: ${JSON.stringify(angleStyle)}`);
 
   return (
     <>
