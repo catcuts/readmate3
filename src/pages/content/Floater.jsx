@@ -4,9 +4,9 @@ import { EventEmitter } from 'events';
 import PropTypes from 'prop-types';
 import avatarDefault from '@assets/img/floaterAvatar.svg';
 import avatarOnStandbyDefault from '@assets/img/floaterAvatarOnStandby.svg';
-import floaterAvatarCloseButton from '@assets/img/floaterAvatarCloseButton.svg';
-import fileUploadButton from '@assets/img/fileUploadButton.svg';
-import msgSendButton from '@assets/img/msgSendButton.svg';
+import closeButtonImg from '@assets/img/floaterCloseButton.svg';
+import fileUploadButtonImg from '@assets/img/fileUploadButton.svg';
+import msgSendButtonImg from '@assets/img/msgSendButton.svg';
 import Overlay from '@pages/content/Overlay';
 import Bubble from '@pages/content/Bubble';
 
@@ -234,6 +234,7 @@ const Floater = ({
     <>
       <Overlay visible={isDragging} />
       <Draggable
+        handle='.floater-avatar'
         onStart={handleStartDragAvatar}
         onDrag={handleDragAvatar}
         onStop={handleStopDragAvatar}
@@ -251,6 +252,7 @@ const Floater = ({
         >
           <div  // Avatar
             ref={avatarRef}
+            className="floater-avatar"
             style={{
               height,
               width,
@@ -266,7 +268,7 @@ const Floater = ({
               <div  // Close Button
                 className="absolute top-0 right-0 w-4 h-4 z-50"
                 style={{
-                  backgroundImage: `url(${chrome.runtime.getURL(floaterAvatarCloseButton)})`,
+                  backgroundImage: `url(${chrome.runtime.getURL(closeButtonImg)})`,
                   backgroundSize: 'cover',
                   cursor: 'pointer',
                 }}
@@ -283,7 +285,7 @@ const Floater = ({
               top: `${parseInt(height)}px`,
               right: '0',
               height: `${bubbleHeight}px`,  // 使用动态计算的高度
-              width: '300px',
+              width: '500px',
               opacity: bubbleOpacity,  // 使用动态计算的透明度
               border: '1px solid black',
               borderRadius: '10px',
@@ -334,7 +336,7 @@ const Floater = ({
                   </>
                 ) : (
                   <div className="flex flex-col h-full">
-                    <div className="flex-grow overflow-y-auto mb-2" style={{ maxHeight: '80px' }}>
+                    <div className="flex-grow overflow-y-auto mb-2" style={{ maxHeight: '120px' }}>
                       <div className="grid grid-cols-2 gap-2">
                         {selectedFiles.map((file, index) => (
                           <div key={index} className="relative bg-gray-100 rounded-lg p-2 text-sm group">
@@ -376,19 +378,19 @@ const Floater = ({
                   ref={messageInputRef}
                   value={message}
                   onChange={handleMessageChange}
-                  className="text-base p-2 rounded-lg resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
-                  style={{ width: '99%', minHeight: '2.5em', maxHeight: '150px', border: 'none' }}
+                  className="bg-transparent text-base p-2 rounded-lg resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
+                  style={{ width: '100%', minHeight: '2.5em', maxHeight: '300px', border: 'none' }}
                   placeholder="向我提问"
                 />
                 <div className="flex justify-between items-center p-2">
                   <img
-                    src={chrome.runtime.getURL(fileUploadButton)}
+                    src={chrome.runtime.getURL(fileUploadButtonImg)}
                     alt="Upload"
                     className="w-6 h-6 cursor-pointer"
                     onClick={handleClickFileInput}
                   />
                   <img
-                    src={chrome.runtime.getURL(msgSendButton)}
+                    src={chrome.runtime.getURL(msgSendButtonImg)}
                     alt="Send"
                     className="w-6 h-6 cursor-pointer"
                     onClick={handleSendMessage}
