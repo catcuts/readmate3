@@ -27,7 +27,7 @@ Overlay.propTypes = {
 
 Overlay.defaultProps = {
   visible: false,
-  color: 'bg-black bg-opacity-0',
+  color: 'bg-opacity-0',
   children: null
 };
 
