@@ -7,6 +7,11 @@ import './style.css'
 
 const div = document.createElement('div');
 div.id = '__root';
+// 设置根元素的样式
+div.style.cssText = `
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+`;
 document.body.appendChild(div);
 
 const rootContainer = document.querySelector('#__root');
