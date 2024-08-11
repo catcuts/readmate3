@@ -221,6 +221,13 @@ const Floater = ({
 
   const handleMessageChange = (e) => {
     setMessage(e.target.value);
+    adjustTextareaHeight(e.target);
+    updateBubbleHeight();
+  };
+
+  const adjustTextareaHeight = (textarea) => {
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 300)}px`;
   };
 
   const handleSendMessage = () => {
@@ -228,6 +235,9 @@ const Floater = ({
     console.log('Sending message:', message);
     // 清空消息输入框
     setMessage('');
+    if (messageInputRef.current) {
+      messageInputRef.current.style.height = 'auto';
+    }
   };
 
   return (
@@ -303,25 +313,27 @@ const Floater = ({
               ref={bubbleContentRef} 
               className="p-4 flex flex-col space-y-4"
             >
+              <div className="text-left text-2xl">你好，即刻开始</div>
               <div 
                 ref={pageSummaryRef}
                 className="flex items-center justify-between p-2 bg-gray-100 rounded-lg"
               >
-                <div className="flex-1 mr-2 overflow-hidden">
-                  <div className="font-bold text-sm whitespace-nowrap overflow-hidden text-overflow-ellipsis">
-                    {document.title || '未命名页面'}
-                  </div>
-                  <div className="text-xs text-gray-500 whitespace-nowrap overflow-hidden text-overflow-ellipsis">
-                    {window.location.href}
-                  </div>
-                </div>
                 <button 
                   onClick={handleSummarize}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm"
+                  className="text-xl bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
                 >
                   总结本页
                 </button>
+                <div className="flex-1 m-2 overflow-hidden">
+                  <div className="font-bold truncate whitespace-nowrap overflow-hidden text-overflow-ellipsis">
+                    {document.title || '未命名页面'}
+                  </div>
+                  <div className="text-sm text-gray-500 truncate whitespace-nowrap overflow-hidden text-overflow-ellipsis">
+                    {window.location.href}
+                  </div>
+                </div>
               </div>
+              <div className="text-left text-xl">或者</div>
               <div
                 ref={fileContainerRef}
                 className="border-2 border-dashed border-gray-300 rounded-lg p-2 cursor-pointer"
@@ -331,7 +343,7 @@ const Floater = ({
               >
                 {selectedFiles.length === 0 ? (
                   <>
-                    <p className="text-gray-500 text-center">阅读文档</p>
+                    <p className="text-gray-500 text-center text-xl">上传文档</p>
                     <p className="text-gray-500 text-center">点击或拖拽文件到此处</p>
                   </>
                 ) : (
@@ -361,7 +373,7 @@ const Floater = ({
                       </div>
                     </div>
                     <div className="w-full h-10 bg-gray-50 rounded-lg flex items-center justify-center text-2xl text-gray-300 cursor-pointer hover:bg-gray-100">
-                      +
+                      + 继续追加文档 +
                     </div>
                   </div>
                 )}
@@ -373,15 +385,17 @@ const Floater = ({
                   multiple
                 />
               </div>
+              <div className="text-left text-xl">同时</div>
               <div className="relative bg-white rounded-lg border-2 border-solid border-gray-300">
                 <textarea
                   ref={messageInputRef}
                   value={message}
                   onChange={handleMessageChange}
-                  className="bg-transparent text-base p-2 rounded-lg resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
-                  style={{ width: '100%', minHeight: '2.5em', maxHeight: '300px', border: 'none' }}
+                  className="font-sans text-xl bg-transparent text-base p-2 rounded-lg resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
+                  style={{ width: '100%', minHeight: '5em', maxHeight: '15em', border: 'none' }}
                   placeholder="向我提问"
                 />
+                <div className="border-t border-gray-200"></div>
                 <div className="flex justify-between items-center p-2">
                   <img
                     src={chrome.runtime.getURL(fileUploadButtonImg)}
