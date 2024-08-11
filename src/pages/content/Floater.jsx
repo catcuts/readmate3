@@ -122,27 +122,51 @@ const Floater = ({
 
     const newPosition = { x: data.x, y: data.y };
 
+    let isPositionNeedingChange = true;
+
     // 如果头像超出右侧边界，
-    // 那么将头像移动到右侧边界，
-    // 并且头像进入停靠状态
+    // 那么头像进入停靠状态
     if (newPosition.x >= 0) {
       newPosition.x = 0;
       setIsDocking(true);
     }
-    // 如果头像没有超出右侧边界，
+    // 如果头像没有超出右侧边界，但是超出左侧边界，
+    // 那么头像 x = 移动之前的 x、y = 移动之前的 y
+    else if (Math.abs(newPosition.x) > window.innerWidth - parseInt(width)) {
+      isPositionNeedingChange = false;
+    }
+    // 如果头像没有超出边界，
     // 那么头像退出停靠状态
     else {
       setIsDocking(false);
     }
 
-    // 设置头像最新位置
-    setPosition(newPosition);
+    // 如果已经确定不需要改变位置，就不再进行 y 的位置判断
+    // 换句话说，如果还需要改变位置，就需要判断 y 的位置
+    if (isPositionNeedingChange) {
+      // 不论 x 在正常范围内与否，y 超出下边界
+      // 那么头像 x = 移动之前的 x、y = 下边界 - 头像高度
+      if (newPosition.y > window.innerHeight - parseInt(height)) {
+        isPositionNeedingChange = false;
+      }
+      // 不论 x 在正常范围内与否，y 超出上边界
+      // 那么头像 x = 移动之前的 x、y = 移动之前的 y
+      else if (newPosition.y < 0) {
+        isPositionNeedingChange = false;
+      }
+    }
 
-    // // 停止拖动，头像进入待命状态
-    // setStatus('standby');
+    // 如果需要改变位置，就设置新位置并记录到 localStorage
+    if (isPositionNeedingChange) {
+      // 设置头像最新位置
+      setPosition(newPosition);
 
-    // 记录当前的高度到 localStorage
-    localStorage.setItem('floaterInitY', newPosition.y);
+      // // 停止拖动，头像进入待命状态
+      // setStatus('standby');
+  
+      // 记录当前的高度到 localStorage
+      localStorage.setItem('floaterInitY', newPosition.y);
+    }
   };
 
   const handleAvatarClick = () => {
