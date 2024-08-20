@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
-import { EventEmitter } from 'events';
 import PropTypes from 'prop-types';
 import avatarDefault from '@assets/img/floaterAvatar.svg';
 import avatarOnStandbyDefault from '@assets/img/floaterAvatarOnStandby.svg';
@@ -25,8 +24,7 @@ import pptFileTypeImg from '@assets/img/pptFileType.svg';
 import zipFileTypeImg from '@assets/img/zipFileType.svg';
 import Overlay from '@pages/content/Overlay';
 import Bubble from '@pages/content/Bubble';
-
-const eventEmitter = new EventEmitter();
+import eventbus from '@pages/content/eventbus';
 
 const Floater = ({
   avatar = avatarDefault,
@@ -93,7 +91,7 @@ const Floater = ({
       //     原因未知，暂时通过这个判断来避免这个问题。
       // 鼠标进入头像区域，头像进入激活状态
       setStatus('active');
-      eventEmitter.emit('FloaterActivated');
+      eventbus.emit('FloaterActivated');
       setIsAutoCloseDisabled(false); // 重新启用自动收起
     }
   };
@@ -107,7 +105,7 @@ const Floater = ({
     if (status !== 'hidden' && !isDragging && !isBubblePinned && !isAutoCloseDisabled) {
       // 鼠标离开头像区域，如果Bubble没有定住且自动收起未被禁用，头像回到待命状态
       setStatus('standby');
-      eventEmitter.emit('FloaterStandby');
+      eventbus.emit('FloaterStandby');
     }
   };
 
@@ -119,10 +117,11 @@ const Floater = ({
     // 点击关闭，头像进入隐藏状态
     setStatus('hidden');
     setIsBubblePinned(false); // 重置Bubble定住状态
-    eventEmitter.emit('FloaterHidden');
+    eventbus.emit('FloaterHidden');
   };
 
-  const handleStartDragAvatar = () => {
+  const handleStartDragAvatar = (e, data) => {
+    console.log('handleStartDragAvatar:', data);
     // 开始拖动，头像进入拖动状态
     setIsDragging(true);
     setHasDragged(false); // 重置拖拽状态
@@ -133,6 +132,7 @@ const Floater = ({
   };
 
   const handleStopDragAvatar = (e, data) => {
+    console.log('handleStopDragAvatar:', data);
     // 停止拖动，头像退出拖动状态
     setIsDragging(false);
 
@@ -186,6 +186,7 @@ const Floater = ({
   };
 
   const handleAvatarClick = () => {
+    console.log(`handleAvatarClick: hasDragged: ${hasDragged}, status: ${status}, isBubblePinned: ${isBubblePinned}`);
     if (!hasDragged) { // 只有在没有发生拖拽的情况下才触发点击事件
       if (status === 'active') {
         if (isBubblePinned) {
@@ -203,6 +204,13 @@ const Floater = ({
       }
     }
     setHasDragged(false); // 重置拖拽状态
+  };
+
+  const handleAvatarDoubleClick = () => {
+    console.log(`handleAvatarDoubleClick: status: ${status}, isDocking: ${isDocking}`);
+    // 双击头像，头像自动回到右侧边缘
+    setPosition({ x: 0, y: usingInitY });
+    setIsDocking(true);
   };
 
   const backgroundImageUrl = status === 'standby' ? avatarOnStandby : avatar;
@@ -340,39 +348,57 @@ const Floater = ({
           onMouseEnter={handleMouseEnterIntoAvatar}
           onMouseLeave={handleMouseLeaveFromAvatar}
         >
-          <div  // Avatar
-            ref={avatarRef}
-            className="floater-avatar"
+          {/* 新增的外壳 */}
+          <div
             style={{
-              height,
-              width,
+              width: `calc(${width} + 10px)`,
+              height: `calc(${height} + 2px)`,
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              borderLeft: '1px solid #D3D3D3',
+              borderTop: '1px solid #D3D3D3',
+              borderBottom: '1px solid #D3D3D3',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
               opacity: status === 'standby' ? 0.5 : 1,
-              backgroundImage: `url(${backgroundImage})`,
-              backgroundSize: 'cover',
-              cursor: 'pointer',
-              transition: 'opacity 0.3s ease-in-out',
             }}
             onClick={handleAvatarClick}
+            onDoubleClick={handleAvatarDoubleClick}
           >
-            {status === 'active' && (
-              <div  // Close Button
-                className="absolute top-0 right-0 w-4 h-4 z-50"
-                style={{
-                  backgroundImage: `url(${chrome.runtime.getURL(closeButtonImg)})`,
-                  backgroundSize: 'cover',
-                  cursor: 'pointer',
-                }}
-                onMouseDown={handleMouseDownOnCloseFlag}
-                onMouseUp={handleMouseUpOnCloseFlag}
-              />
-            )}
+            <div  // Avatar
+              ref={avatarRef}
+              className="floater-avatar"
+              style={{
+                height,
+                width,
+                backgroundImage: `url(${backgroundImage})`,
+                backgroundSize: 'cover',
+                cursor: 'pointer',
+                transition: 'opacity 0.3s ease-in-out',
+                marginRight: '5px',
+              }}
+            >
+              {status === 'active' && (
+                <div  // Close Button
+                  className="absolute top-0 right-0 w-4 h-4 z-50"
+                  style={{
+                    backgroundImage: `url(${chrome.runtime.getURL(closeButtonImg)})`,
+                    backgroundSize: 'cover',
+                    cursor: 'pointer',
+                  }}
+                  onMouseDown={handleMouseDownOnCloseFlag}
+                  onMouseUp={handleMouseUpOnCloseFlag}
+                />
+              )}
+            </div>
           </div>
           <Bubble
             ref={bubbleRef}
             position={bubblePosition}
             style={{
               position: 'absolute',
-              top: `${parseInt(height)}px`,
+              // top: `calc(${parseInt(height)}px + 4px)`,
               right: '0',
               height: `${bubbleHeight}px`,  // 使用动态计算的高度
               width: '500px',
@@ -393,14 +419,15 @@ const Floater = ({
               ref={bubbleContentRef}
               className="p-4 flex flex-col space-y-4"
             >
-              <div className="text-left text-2xl">你好，即刻开始</div>
+              <div className="text-left text-2xl" style={{ color: "#34495e" }}>你好，即刻开始</div>
               <div
                 ref={pageSummaryRef}
                 className="flex items-center justify-between p-2 bg-gray-100 rounded-lg"
+                style={{ color: "#34495e" }}
               >
                 <button
                   onClick={handleSummarize}
-                  className="text-xl bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                  className="text-xl bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded"
                 >
                   总结本页
                 </button>
@@ -413,7 +440,7 @@ const Floater = ({
                   </div>
                 </div>
               </div>
-              <div className="text-left text-xl">或者</div>
+              <div className="text-left text-xl" style={{ color: "#34495e" }}>或者</div>
               <div
                 ref={fileContainerRef}
                 className="border-2 border-dashed border-gray-300 rounded-lg p-2 cursor-pointer"
@@ -423,8 +450,8 @@ const Floater = ({
               >
                 {selectedFiles.length === 0 ? (
                   <>
-                    <p className="text-gray-500 text-center text-xl">上传文档</p>
-                    <p className="text-gray-500 text-center">点击或拖拽文件到此处</p>
+                    <p className="text-gray-500 text-center text-xl" style={{ color: "#34495e" }}>上传文档</p>
+                    <p className="text-gray-500 text-center" style={{ color: "#34495e" }}>点击或拖拽文件到此处</p>
                   </>
                 ) : (
                   <div className="flex flex-col h-full">
@@ -458,7 +485,7 @@ const Floater = ({
                         ))}
                       </div>
                     </div>
-                    <div className="w-full h-10 bg-gray-50 rounded-lg flex items-center justify-center text-2xl text-gray-300 cursor-pointer hover:bg-gray-100">
+                    <div className="w-full h-10 bg-gray-50 rounded-lg flex items-center justify-center text-xl text-gray-300 cursor-pointer hover:bg-gray-100" style={{ color: "#34495e" }}>
                       + 继续追加文档 +
                     </div>
                   </div>
@@ -471,14 +498,14 @@ const Floater = ({
                   multiple
                 />
               </div>
-              <div className="text-left text-xl">同时</div>
+              <div className="text-left text-xl" style={{ color: "#34495e" }}>同时</div>
               <div className="relative bg-white rounded-lg border-2 border-solid border-gray-300">
                 <textarea
                   ref={messageInputRef}
                   value={message}
                   onChange={handleMessageChange}
                   className="font-sans text-xl bg-transparent text-base p-2 rounded-lg resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
-                  style={{ width: '100%', minHeight: '5em', maxHeight: '15em', border: 'none' }}
+                  style={{ color: "#34495e", width: '100%', minHeight: '5em', maxHeight: '15em', border: 'none' }}
                   placeholder="向我提问"
                 />
                 <div className="border-t border-gray-200"></div>
