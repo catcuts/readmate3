@@ -41,6 +41,12 @@ export default function buildContentScript() {
                 },
               },
             },
+            minify: 'terser',
+            terserOptions: {
+              output: {
+                ascii_only: true,
+              },
+            },
           },
           configFile: false,
         });

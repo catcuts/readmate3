@@ -52,5 +52,11 @@ export default defineConfig({
         entryFileNames: (chunk) => `src/pages/${chunk.name}/index.js`,
       },
     },
+    minify: 'terser',
+    terserOptions: {
+      output: {
+        ascii_only: true,
+      },
+    },
   },
 });
