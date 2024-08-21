@@ -8,9 +8,9 @@ import fileUploadButtonImg from '@assets/img/fileUploadButton.svg';
 import msgSendButtonImg from '@assets/img/msgSendButton.svg';
 import Overlay from '@pages/content/Overlay';
 import Bubble from '@pages/content/Bubble';
+import ChatInput from '@pages/content/ChatInput';
 import File from '@pages/content/File';
 import eventbus from '@pages/content/eventbus';
-import { Input } from 'postcss';
 
 const Floater = ({
   avatar = avatarDefault,
@@ -39,7 +39,6 @@ const Floater = ({
   const [bubbleHeight, setBubbleHeight] = useState(0); // 控制 Bubble 的高度
   const [bubbleOpacity, setBubbleOpacity] = useState(0); // 控制 Bubble 的透明度
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [message, setMessage] = useState('');
   const [isBubblePinned, setIsBubblePinned] = useState(false); // 新增状态，用于控制Bubble是否定住
   const [hasDragged, setHasDragged] = useState(false); // 新增状态，用于跟踪是否发生了拖拽
   const [isAutoCloseDisabled, setIsAutoCloseDisabled] = useState(false); // 新增状态，用于控制是否暂时停用自动收起
@@ -47,9 +46,8 @@ const Floater = ({
   const bubbleRef = useRef(null);
   const bubbleContentRef = useRef(null);
   const pageSummaryRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const messageInputRef = useRef(null);
   const fileContainerRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (status === 'active') {
@@ -241,24 +239,12 @@ const Floater = ({
   };
 
   const handleMessageChange = (e) => {
-    setMessage(e.target.value);
-    adjustTextareaHeight(e.target);
     updateBubbleHeight();
   };
 
-  const adjustTextareaHeight = (textarea) => {
-    textarea.style.height = 'auto';
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 300)}px`;
-  };
-
-  const handleSendMessage = () => {
+  const handleSendMessage = (message) => {
     // 这里是发送消息的空函数
     console.log('Sending message:', message);
-    // 清空消息输入框
-    setMessage('');
-    if (messageInputRef.current) {
-      messageInputRef.current.style.height = 'auto';
-    }
   };
 
   return (
@@ -409,32 +395,11 @@ const Floater = ({
                 />
               </div>
               <div className="text-left text-xl" style={{ color: "#34495e" }}>同时</div>
-              <Input></Input>
-              <div className="relative bg-white rounded-lg border-2 border-solid border-gray-300">
-                <textarea
-                  ref={messageInputRef}
-                  value={message}
-                  onChange={handleMessageChange}
-                  className="font-sans text-xl bg-transparent text-base p-2 rounded-lg resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
-                  style={{ color: "#34495e", width: '100%', minHeight: '5em', maxHeight: '15em', border: 'none' }}
-                  placeholder="向我提问"
-                />
-                <div className="border-t border-gray-200"></div>
-                <div className="flex justify-between items-center p-2">
-                  <img
-                    src={chrome.runtime.getURL(fileUploadButtonImg)}
-                    alt="Upload"
-                    className="w-6 h-6 cursor-pointer"
-                    onClick={handleClickFileInput}
-                  />
-                  <img
-                    src={chrome.runtime.getURL(msgSendButtonImg)}
-                    alt="Send"
-                    className="w-6 h-6 cursor-pointer"
-                    onClick={handleSendMessage}
-                  />
-                </div>
-              </div>
+              <ChatInput
+                onTextChange={handleMessageChange}
+                onFileChange={handleFileUpload}
+                onSend={handleSendMessage}
+              />
             </div>
           </Bubble>
         </div>
