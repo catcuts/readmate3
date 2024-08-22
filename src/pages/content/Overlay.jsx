@@ -2,16 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { createPortal } from 'react-dom';
 
-const Overlay = ({ visible, color, children }) => {
-  if (!visible) return null;
+const Overlay = ({ 
+  children,
+  className = '',
+  style = {},
+}) => {
 
-  const overlayCustomBgClass = color.startsWith('bg-') ? color : ''; 
-  const overlayCustomStyle = color.startsWith('bg-') ? {} : { backgroundColor: color };
+  const useClassName = `fixed inset-0 flex justify-center items-center bg-opacity-0 ${className}`;
+  const useStyle = style;
 
   return createPortal(
     <div
-      className={`${overlayCustomBgClass} fixed inset-0 flex justify-center items-center z-30`}
-      style={overlayCustomStyle}
+      className={useClassName}
+      style={useStyle}
     >
       {children}
     </div>,
@@ -20,15 +23,15 @@ const Overlay = ({ visible, color, children }) => {
 };
 
 Overlay.propTypes = {
-  visible: PropTypes.bool,
-  color: PropTypes.string,
-  children: PropTypes.node
+  children: PropTypes.node,
+  className: PropTypes.string,
+  style: PropTypes.object,
 };
 
 Overlay.defaultProps = {
-  visible: false,
-  color: 'bg-opacity-0',
-  children: null
+  children: null,
+  className: '',
+  style: {},
 };
 
 export default Overlay;
