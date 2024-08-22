@@ -32,15 +32,16 @@ function App() {
 }
 
 const div = document.createElement('div');
-div.id = '__root';
-// 设置根元素的样式
+div.id = 'readmate-extension-root';
+// 设置根元素的样式，这样可以确保根元素的样式不会被网页的样式覆盖
 div.style.cssText = `
+  line-height: 1.5;
   font-size: 16px;
   font-family: Arial, sans-serif;
 `;
 document.body.appendChild(div);
 
-const rootContainer = document.querySelector('#__root');
+const rootContainer = document.querySelector('#readmate-extension-root');
 if (!rootContainer) throw new Error("Can't find Content root element");
 const root = createRoot(rootContainer);
 root.render(<App />);

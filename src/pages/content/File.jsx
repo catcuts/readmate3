@@ -71,7 +71,7 @@ const getFileIcon = (file) => {
 
 const File = ({ index, file, onRemove }) => {
   return (
-    <div key={index} className="relative bg-gray-100 rounded-lg p-2 text-sm group">
+    <div key={index} className="relative bg-gray-100 rounded-2xs p-2 text-sm group">
       <div className="flex items-center">
         <div className="mr-2">
           <img
@@ -90,7 +90,7 @@ const File = ({ index, file, onRemove }) => {
           e.stopPropagation();
           if (onRemove) onRemove(index);
         }}
-        className="absolute top-1 right-1 bg-gray-200 hover:bg-gray-300 border-0 rounded-full w-4 h-4 flex items-center justify-center text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-1 right-1 bg-gray-200 hover:bg-gray-300 border-0 rounded-2xs-full w-4 h-4 flex items-center justify-center text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
       >
         ×
       </button>

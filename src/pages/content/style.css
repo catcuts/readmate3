@@ -1,3 +1,13 @@
 /* @tailwind base;  内容注入不宜包含 tailwind 基础样式，否则可能会影响所在网页的样式，例如谷歌搜索结果标题样式都变成了某种黑灰色、某些页面的图标位置显示异常等 */
 @tailwind components;
 @tailwind utilities;
+
+#readmate-extension-root {
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+#readmate-extension-root * {
+  line-height: inherit;
+  font-size: inherit;
+}

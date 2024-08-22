@@ -21,7 +21,7 @@ const Bubble = ({
   style = {},
 }) => {
 
-  const boxClassName = `absolute border-solid rounded-lg ${className}`;
+  const boxClassName = `absolute border-solid rounded-2xs ${className}`;
   const boxStyle = {
     ...defaultBackgroundStyle,
     ...style,

@@ -57,12 +57,12 @@ const ChatInput = ({
   };
   return (
     <>
-      <div className="relative bg-white rounded-lg border-2 border-solid border-gray-300">
+      <div className="relative bg-white rounded-2xs border-2 border-solid border-gray-300">
         <textarea
           ref={textareaRef}
           value={text}
           onChange={handleTextChange}
-          className="font-sans text-xl bg-transparent text-base p-2 rounded-lg resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
+          className="font-sans text-xl bg-transparent text-base p-2 rounded-2xs resize-none overflow-y-auto border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
           style={{ color: "#34495e", width: '100%', minHeight: '5em', maxHeight: '15em', border: 'none' }}
           placeholder={placeholder}
         />
