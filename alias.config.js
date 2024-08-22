@@ -1,6 +1,7 @@
 import { resolve } from 'path';
 
 export const pwd = resolve(__dirname);
+export const utilsDir = resolve(pwd, 'utils');
 export const srcDir = resolve(pwd, 'src');
 export const pagesDir = resolve(srcDir, 'pages');
 export const assetsDir = resolve(srcDir, 'assets');

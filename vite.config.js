@@ -7,7 +7,7 @@ import { outputFolderName } from './utils/constants';
 import copyI18n from './utils/plugins/copy-i18n';
 import alias from '@rollup/plugin-alias';
 import svgr from "vite-plugin-svgr";
-import { pwd, srcDir, pagesDir, assetsDir, publicDir } from './alias.config';
+import { pwd, utilsDir, srcDir, pagesDir, assetsDir, publicDir } from './alias.config';
 
 const outDir = resolve(pwd, outputFolderName);
 
@@ -15,6 +15,7 @@ const outDir = resolve(pwd, outputFolderName);
 export default defineConfig({
   resolve: {
     alias: {
+      '@utils': utilsDir,
       '@src': srcDir,
       '@assets': assetsDir,
       '@pages': pagesDir,
@@ -23,6 +24,7 @@ export default defineConfig({
   plugins: [
     alias({
       entries: {
+        '@utils': utilsDir,
         '@src': srcDir,
         '@assets': assetsDir,
         '@pages': pagesDir,

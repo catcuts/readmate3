@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import { outputFolderName } from '../constants';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
-import { pwd, srcDir, pagesDir, assetsDir, publicDir } from '../../alias.config';
+import { pwd, utilsDir, srcDir, pagesDir, assetsDir, publicDir } from '../../alias.config';
 
 const packages = [
   {
@@ -23,6 +23,7 @@ export default function buildContentScript() {
           publicDir: false,
           resolve: {
             alias: {
+              '@utils': utilsDir,
               '@src': srcDir,
               '@assets': assetsDir,
               '@pages': pagesDir,
