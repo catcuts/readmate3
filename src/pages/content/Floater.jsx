@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import Draggable from 'react-draggable';
 import PropTypes from 'prop-types';
 import avatarDefault from '@assets/img/floaterAvatar.svg';
 import avatarOnStandbyDefault from '@assets/img/floaterAvatarOnStandby.svg';
 import closeButtonImg from '@assets/img/floaterCloseButton.svg';
-import fileUploadButtonImg from '@assets/img/fileUploadButton.svg';
-import msgSendButtonImg from '@assets/img/msgSendButton.svg';
 import Overlay from '@pages/content/Overlay';
 import Bubble from '@pages/content/Bubble';
 import ChatInput from '@pages/content/ChatInput';
 import File from '@pages/content/File';
 import eventbus from '@pages/content/eventbus';
+import { ZIndexContext } from '.';
 
 const Floater = ({
   avatar = avatarDefault,
@@ -247,9 +246,11 @@ const Floater = ({
     console.log('Sending message:', message);
   };
 
+  const maxZIndex = useContext(ZIndexContext);
+
   return (
     <>
-      <Overlay visible={isDragging} />
+      {isDragging && <Overlay style={{ zIndex: maxZIndex - 1 }} />}
       <Draggable
         handle='.floater-avatar'
         onStart={handleStartDragAvatar}
@@ -258,8 +259,9 @@ const Floater = ({
         position={position}
       >
         <div  // 包含 Avatar 和 Bubble 的容器
-          className={`fixed z-50 ${status === 'hidden' ? 'hidden' : 'block'}`}
+          className={`fixed ${status === 'hidden' ? 'hidden' : 'block'}`}
           style={{
+            zIndex: maxZIndex,
             top: 0,
             right: isDocking && (status === 'standby') ? `-${parseInt(width) / 2}px` : '0',
             transition: 'right 0.3s ease-in-out',
@@ -300,8 +302,9 @@ const Floater = ({
             >
               {status === 'active' && (
                 <div  // Close Button
-                  className="absolute top-0 right-0 w-4 h-4 z-50"
+                  className="absolute top-0 right-0 w-4 h-4"
                   style={{
+                    zIndex: maxZIndex + 1,
                     backgroundImage: `url(${chrome.runtime.getURL(closeButtonImg)})`,
                     backgroundSize: 'cover',
                     cursor: 'pointer',
