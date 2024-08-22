@@ -8,6 +8,7 @@ import Overlay from '@pages/content/Overlay';
 import Bubble from '@pages/content/Bubble';
 import ChatInput from '@pages/content/ChatInput';
 import File from '@pages/content/File';
+import Filebox from '@pages/content/Filebox';
 import eventbus from '@pages/content/eventbus';
 import { ZIndexContext } from '.';
 
@@ -45,8 +46,7 @@ const Floater = ({
   const bubbleRef = useRef(null);
   const bubbleContentRef = useRef(null);
   const pageSummaryRef = useRef(null);
-  const fileContainerRef = useRef(null);
-  const fileInputRef = useRef(null);
+  const maxZIndex = useContext(ZIndexContext);
 
   useEffect(() => {
     if (status === 'active') {
@@ -207,34 +207,20 @@ const Floater = ({
     // 在这里添加总结页面的逻辑
   };
 
-  const handleFileUpload = (event) => {
-    // console.log('handleFileUpload');
-    const newFiles = Array.from(event.target.files || event.dataTransfer.files);
-    setSelectedFiles(prevFiles => [...prevFiles, ...newFiles]);
+  const handleFileChange = (newFiles) => {
+    setSelectedFiles(newFiles);
     setIsAutoCloseDisabled(true); // 禁用自动收起
-    // console.log('handleFileUpload - isAutoCloseDisabled:', isAutoCloseDisabled);
-  };
-
-  const handleRemoveFile = (index) => {
-    setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
-  };
-
-  const handleDragOver = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-
-  const handleDrop = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    handleFileUpload(event);
   };
 
   const handleClickFileInput = () => {
-    // console.log('handleClickFileInput');
     setIsAutoCloseDisabled(true); // 禁用自动收起
-    // console.log('handleClickFileInput - isAutoCloseDisabled:', isAutoCloseDisabled);
-    fileInputRef.current.click();
+  };
+
+  const handleRemoveFile = (index, removedFile, newFiles) => {
+    setSelectedFiles(newFiles);
+    // if (newFiles.length === 0) {
+    //   setIsAutoCloseDisabled(false); // 重新启用自动收起
+    // }
   };
 
   const handleMessageChange = (e) => {
@@ -245,8 +231,6 @@ const Floater = ({
     // 这里是发送消息的空函数
     console.log('Sending message:', message);
   };
-
-  const maxZIndex = useContext(ZIndexContext);
 
   return (
     <>
@@ -341,15 +325,17 @@ const Floater = ({
               ref={bubbleContentRef}
               className="p-4 flex flex-col space-y-4"
             >
+
               <div className="text-left text-2xl" style={{ color: "#34495e" }}>你好，即刻开始</div>
+
               <div
                 ref={pageSummaryRef}
-                className="flex items-center justify-between p-2 bg-gray-100 rounded-lg"
+                className="flex items-center justify-between p-2 bg-gray-100 rounded-2xs"
                 style={{ color: "#34495e" }}
               >
                 <button
                   onClick={handleSummarize}
-                  className="text-xl bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded"
+                  className="text-xl bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-2xs"
                 >
                   总结本页
                 </button>
@@ -362,47 +348,24 @@ const Floater = ({
                   </div>
                 </div>
               </div>
+
               <div className="text-left text-xl" style={{ color: "#34495e" }}>或者</div>
-              <div
-                ref={fileContainerRef}
-                className="border-2 border-dashed border-gray-300 rounded-lg p-2 cursor-pointer"
-                onClick={handleClickFileInput}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-              >
-                {selectedFiles.length === 0 ? (
-                  <>
-                    <p className="text-gray-500 text-center text-xl" style={{ color: "#34495e" }}>上传文档</p>
-                    <p className="text-gray-500 text-center" style={{ color: "#34495e" }}>点击或拖拽文件到此处</p>
-                  </>
-                ) : (
-                  <div className="flex flex-col h-full">
-                    <div className="flex-grow overflow-y-auto mb-2" style={{ maxHeight: '120px' }}>
-                      <div className="grid grid-cols-2 gap-2">
-                        {selectedFiles.map((file, index) => (
-                          <File index={index} file={file} onRemove={handleRemoveFile} />
-                        ))}
-                      </div>
-                    </div>
-                    <div className="w-full h-10 bg-gray-50 rounded-lg flex items-center justify-center text-xl text-gray-300 cursor-pointer hover:bg-gray-100" style={{ color: "#34495e" }}>
-                      + 继续追加文档 +
-                    </div>
-                  </div>
-                )}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  multiple
-                />
-              </div>
+
+              <Filebox
+                files={selectedFiles}
+                onFileInputClick={handleClickFileInput}
+                onFileChange={handleFileChange}
+                onFileRemove={handleRemoveFile}
+              />
+
               <div className="text-left text-xl" style={{ color: "#34495e" }}>同时</div>
+
               <ChatInput
                 onTextChange={handleMessageChange}
-                onFileChange={handleFileUpload}
+                onFileChange={handleFileChange}
                 onSend={handleSendMessage}
               />
+
             </div>
           </Bubble>
         </div>
