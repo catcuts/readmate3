@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import File from '@pages/content/File';
 import combineList from '@utils/combine-list';
+import substractList from '@utils/substract-list';
 import { ZIndexContext } from '.';
 
 const Filebox = ({
@@ -9,12 +10,19 @@ const Filebox = ({
   onFileChange,
   onFileRemove,
 }) => {
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState(files);
   useEffect(() => {
-    files = Array.from(files);
-    setSelectedFiles(files);
-    if (onFileChange) {
-      onFileChange(files);
+    console.log('[Filebox] useEffect onFileChange', files.isFileChangedByFilebox);
+    if (!files.isFileChangedByFilebox) {
+      console.log('[Filebox] useEffect onFileChange', files);
+      setSelectedFiles(files);
+      if (onFileChange) {
+        const newFiles = [...files];
+        newFiles.isFileChangedByFilebox = true;
+        if (onFileChange) {
+          onFileChange(newFiles, 'Filebox - useEffect');
+        }
+      }
     }
   }, [files]);
   const fileContainerRef = useRef(null);
@@ -42,16 +50,18 @@ const Filebox = ({
   const handleFileChange = (event) => {
     const addSelectedFiles = Array.from(event.target.files || event.dataTransfer.files);
     // 注意去重
-    setSelectedFiles(prevFiles => combineList(prevFiles, addSelectedFiles));
+    setSelectedFiles(prevFiles => combineList(prevFiles, addSelectedFiles, { key: 'name' }));
+    // 调用回调函数
     if (onFileChange) {
-      onFileChange(combineList(selectedFiles, addSelectedFiles));
+      console.log('[Filebox] handleFileChange onFileChange');
+      onFileChange(combineList(selectedFiles, addSelectedFiles, { key: 'name', flag: 'isFileChangedByFilebox' }), 'Filebox - handleFileChange');
     }
   };
 
   const handleRemoveFile = (index) => {
-    setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+    setSelectedFiles(prevFiles => substractList(prevFiles, [selectedFiles[index]], { key: 'name' }));
     if (onFileRemove) {
-      onFileRemove(index, selectedFiles[index], selectedFiles);
+      onFileRemove(index, selectedFiles[index], substractList(files, [selectedFiles[index]], { key: 'name', flag: 'isFileChangedByFilebox' })); 
     }
   }
 
@@ -73,7 +83,7 @@ const Filebox = ({
           <div className="flex-grow overflow-y-auto mb-2" style={{ maxHeight: '120px' }}>
             <div className="grid grid-cols-2 gap-2">
               {selectedFiles.map((file, index) => (
-                <File index={index} file={file} onRemove={handleRemoveFile} />
+                <File index={index} file={file} onFileRemove={handleRemoveFile} />
               ))}
             </div>
           </div>

@@ -26,6 +26,7 @@ function App() {
 
   return (
     <ZIndexContext.Provider value={zIndex}>
+      <Chatbox chatRecords={chatRecords} />
       <Floater />
     </ZIndexContext.Provider>
   );

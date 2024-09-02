@@ -1,13 +1,17 @@
-export default function combineList(list1, list2) {
+export default function combineList(list1, list2, { key = 'id', flag } = {}) {
   const map = list1.reduce((map, item) => {
-    map[item.name] = item;
+    map[item[key]] = item;
     return map;
   }, {});
-  const newFiles = [];
-  for (const file of list2) {
-    if (!map[file.name]) {
-      newFiles.push(file);
+  const newItems = [];
+  for (const item of list2) {
+    if (!map[item[key]]) {
+      newItems.push(item);
     }
   }
-  return [...list1, ...newFiles];
+  const newList = [...list1, ...newItems];
+  if (flag) {
+    newList[flag] = true;
+  }
+  return newList;
 };

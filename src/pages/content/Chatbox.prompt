@@ -1,0 +1,47 @@
+请使用 React + Tailwind 编写一个 React 组件，名叫“Chatbox”，我的需求是：
+
+1. 这个 Chatbox 用于展示聊天内容（chat records），聊天内容是一个数组，数组中的每个元素是一条聊天记录（chat record），每条聊天记录数据是一个对象，对象有以下属性：
+  - id：用来指定这个聊天内容的唯一标识，是一个字符串。
+  - thread_id：用来指定这个聊天内容所属的对话线程的唯一标识，是一个字符串。所谓对话线程，是指一组连续的聊天内容，这组聊天内容中的每个聊天内容都有相同的 thread_id。
+  - role：用来指定这个聊天内容的角色，是一个字符串，取值可以是'user'或'assistant'。
+  - content：用来指定这个聊天内容的内容，是一个数组，数组中的每个元素是一个对象，对象有以下属性：
+    - type：用来指定这个聊天内容的类型，是一个字符串，取值可以是'text'或'image'。
+    - text：如果 type 是 'text'，则这个属性用来指定这个聊天内容的文本内容，是一个字符串。
+    - image_url：如果 type 是 'image'，则这个属性用来指定这个聊天内容的图片 URL，是一个对象，对象有以下属性：
+      - url：用来指定这个图片的 URL，是一个字符串。
+      - detail: 用来指定这个图片的详细信息，是一个字符串。
+    - image_file: 如果 type 是 'image'，则这个属性用来指定这个聊天内容的图片文件，是一个对象，对象有以下属性：
+      - file_id：用来指定这个图片的唯一标识，是一个字符串。
+      - detail: 用来指定这个图片的详细信息，是一个字符串。
+    - attachments：用来指定这个聊天内容的附件，是一个数组，数组中的每个元素是一个对象，对象有两个属性：
+      - file_id：用来指定这个附件的唯一标识，是一个字符串。
+      - tools：用来指定这个附件的工具，是一个数组，数组中的每个元素是一个对象，对象有一个属性：
+        - type：用来指定这个工具的类型，是一个字符串，取值可以是'code_interpreter'或'file_search'。
+    - attachmentsWithDetail：用来指定这个聊天内容的附件，是一个数组，数组中的每个元素是一个对象，对象有两个属性：
+      - id：用来指定这个附件的唯一标，是一个字符串。
+      - name：用来指定这个附件的文件名称，是一个字符串。
+      - status：用来指定这个附件的状态，是一个字符串，取值可以是'pending'、'processing'、'completed'或'failed'。
+
+  例如：
+  ```js
+  const chatRecords = [
+    { id: '1', thread_id: '11', role: 'user', content: [ { type: 'text', text: 'Hello, Floater!', attachments: [] } ], },
+    { id: '2', thread_id: '11', role: 'assistant', content: [ { type: 'text', text: 'Hi, there!', attachments: [] } ], },
+    { id: '3', thread_id: '11', role: 'user', content: [ { type: 'text', text: 'How are you?', attachments: [] } ], },
+    { id: '4', thread_id: '11', role: 'assistant', content: [ { type: 'text', text: 'I am fine, thank you!', attachments: [] } ], },
+  ];
+  ```
+
+2. 在这个 Chatbox 中，用户的聊天记录（role 为 'user'）显示在左侧，助手的聊天记录（role 为 'assistant'）显示在右侧，左右两侧的聊天记录仅需稍微错开，用户的聊天记录背景色为淡蓝色，助手的聊天记录背景色为淡绿色。
+
+3. 其中，每条聊天记录都是一个聊天记录组件（ChatRecord），这个聊天记录组件的 props 中包含一个 data 对象，这个 data 对象传入的就是这条聊天记录的数据对象。
+
+4. 这个 ChatRecord 会根据这个聊天记录数据对象的 role 属性来决定这个聊天记录组件的显示位置（左侧或右侧）。
+
+5. 这个 ChatRecord 根据这个聊天记录对象的 content 属性来决定这个聊天记录组件的显示内容，例如：
+  - 如果 content 的 attachments 属性是一个空数组，则这个聊天记录组件只显示 content 的文本内容（text）；
+  - 如果 content 的 attachments 属性不是一个空数组，则这个聊天记录组件的上部分显示附件（附件文件类型图标+附件文件名+附件文件大小），下部分显示文本内容（text）。
+  （其它情况暂不处理）
+
+6. 
+

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import fileUploadButtonImg from '@assets/img/fileUploadButton.svg';
 import msgSendButtonImg from '@assets/img/msgSendButton.svg';
+import combineList from '@utils/combine-list';
 
 const ChatInput = ({
+  files = [],
   onTextChange,
   onFileChange,
   onSend,
@@ -15,19 +17,25 @@ const ChatInput = ({
   const fileInputRef = useRef(null);
 
   const adjustTextareaHeight = () => {
-    textareaRef.current.style.height = 'auto';
-    textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 300)}px`;
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      const newHeight = Math.min(textareaRef.current.scrollHeight, 200);
+      textareaRef.current.style.height = `${newHeight}px`;
+      // 通知父组件高度变化
+      if (onTextChange) {
+        onTextChange({ target: { value: text }, height: newHeight });
+      }
+    }
   };
 
-  const handleTextChange = () => {
-    // 更新消息输入框的值
-    setText(textareaRef.current.value);
-    // 调整输入框高度
+  useEffect(() => {
     adjustTextareaHeight();
-    // 调用回调函数
-    if (onTextChange) {
-      onTextChange(textareaRef.current.value);
-    }
+  }, [text]);
+
+  const handleTextChange = (e) => {
+    // 更新消息输入框的值
+    setText(e.target.value);
+    // 调整输入框高度会在useEffect中处理
   };
   
   const handleClickFileUpload = () => {
@@ -35,10 +43,11 @@ const ChatInput = ({
     fileInputRef.current.click();
   }
 
-  const handleFileChange = () => {
+  const handleFileChange = (event) => {
     // 调用回调函数
     if (onFileChange) {
-      onFileChange(fileInputRef.current.files);
+      const addSelectedFiles = Array.from(event.target.files || event.dataTransfer.files);
+      onFileChange(combineList(files, addSelectedFiles, { key: 'name' }), 'ChatInput');
     }
   }
   
@@ -52,9 +61,10 @@ const ChatInput = ({
     adjustTextareaHeight();
     // 调用回调函数
     if (onSend) {
-      onSend(textareaRef.current.value);
+      onSend(text);
     }
   };
+
   return (
     <>
       <div className="relative bg-white rounded-2xs border-2 border-solid border-gray-300">
@@ -76,7 +86,7 @@ const ChatInput = ({
             onClick={handleClickFileUpload}
           />
           <img
-          ref={sendButtonRef}
+            ref={sendButtonRef}
             src={chrome.runtime.getURL(msgSendButtonImg)}
             alt="Send"
             className="w-6 h-6 cursor-pointer"

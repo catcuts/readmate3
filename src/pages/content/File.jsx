@@ -28,8 +28,7 @@ const getFileIcon = (file) => {
   // 这里可以根据文件类型返回不同的图标
   const fileExtName = file.name.split('.').pop().toLowerCase();
   switch (fileExtName) {
-    case 'jpg':
-    case 'jpeg':
+    case 'jpg' || 'jpeg':
       return jpgFileTypeImg;
     case 'png':
       return pngFileTypeImg;
@@ -43,35 +42,28 @@ const getFileIcon = (file) => {
       return musicFileTypeImg;
     case 'mp4':
       return mp4FileTypeImg;
+    case 'ts' || 'flv' || 'avi' || 'rmvb' || 'rm' || 'asf' || 'divx' || 'wmv' || '3gp' || 'mkv':
+      return videoFileTypeImg;
     case 'txt':
       return txtFileTypeImg;
     case 'pdf':
       return pdfFileTypeImg;
-    case 'doc':
-    case 'docx':
+    case 'doc' || 'docx':
       return wordFileTypeImg;
-    case 'xls':
-    case 'xlsx':
+    case 'xls' ||  'xlsx':
       return excelFileTypeImg;
-    case 'ppt':
-    case 'pptx':
+    case 'ppt' || 'pptx':
       return pptFileTypeImg;
-    case 'zip':
-    case 'rar':
-    case '7z':
-    case 'tar':
-    case 'gz':
-    case 'bz2':
-    case 'xz':
+    case 'zip' || 'rar' || '7z' || 'tar' || 'gz' || 'bz2' || 'xz':
       return zipFileTypeImg;
     default:
       return defaultFileTypeImg;
   };
 };
 
-const File = ({ index, file, onRemove }) => {
+const File = ({ index, file, onFileRemove }) => {
   return (
-    <div key={index} className="relative bg-gray-100 rounded-2xs p-2 text-sm group">
+    <div key={index} className="relative bg-gray-100 border-solid border-[1px] border-gray-200 rounded-2xs p-2 text-sm text-gray-800 w-40 group">
       <div className="flex items-center">
         <div className="mr-2">
           <img
@@ -85,15 +77,15 @@ const File = ({ index, file, onRemove }) => {
           <div className="text-xs text-gray-500">{formatFileSize(file.size)}</div>
         </div>
       </div>
-      <button
+      {onFileRemove && <button
         onClick={(e) => {
           e.stopPropagation();
-          if (onRemove) onRemove(index);
+          if (onFileRemove) onFileRemove(index, file);
         }}
-        className="absolute top-1 right-1 bg-gray-200 hover:bg-gray-300 border-0 rounded-2xs-full w-4 h-4 flex items-center justify-center text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-1 right-1 bg-gray-200 hover:bg-gray-300 border-0 rounded-full w-4 h-4 flex items-center justify-center text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
       >
         ×
-      </button>
+      </button>}
     </div>
   );
 };

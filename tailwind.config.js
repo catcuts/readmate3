@@ -35,6 +35,7 @@ module.exports = {
         map[key] = sizeMap[key]
         return map
       }, {}),
+      full: '45%',
     },
     extend: {
       // 宽度

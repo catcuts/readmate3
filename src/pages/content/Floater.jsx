@@ -39,9 +39,9 @@ const Floater = ({
   const [bubbleHeight, setBubbleHeight] = useState(0); // 控制 Bubble 的高度
   const [bubbleOpacity, setBubbleOpacity] = useState(0); // 控制 Bubble 的透明度
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [isBubblePinned, setIsBubblePinned] = useState(false); // 新增状态，用于控制Bubble是否定住
-  const [hasDragged, setHasDragged] = useState(false); // 新增状态，用于跟踪是否发生了拖拽
-  const [isAutoCloseDisabled, setIsAutoCloseDisabled] = useState(false); // 新增状态，用于控制是否暂时停用自动收起
+  const isBubblePinned = useRef(false); // 控制Bubble是否定住
+  const hasDragged = useRef({ x: 0, y: 0 });  // 拖拽位移
+  const isAutoCloseDisabled = useRef(false); // 控制是否暂时停用自动收起
   const avatarRef = useRef(null);
   const bubbleRef = useRef(null);
   const bubbleContentRef = useRef(null);
@@ -49,6 +49,7 @@ const Floater = ({
   const maxZIndex = useContext(ZIndexContext);
 
   useEffect(() => {
+    console.log('[Floater] useEffect: selectedFiles', selectedFiles);
     if (status === 'active') {
       setBubbleOpacity(1); // 显示时设置 Bubble 透明度为 1，触发动画效果
       updateBubbleHeight();
@@ -66,7 +67,7 @@ const Floater = ({
   };
 
   const handleMouseEnterIntoAvatar = (e) => {
-    // console.log(`handleMouseEnterIntoAvatar`, e);
+    // console.log(`[Floater] handleMouseEnterIntoAvatar`, e);
     if (status !== 'hidden' && status !== 'active') {
       // 注：这里 多了一个 status !== 'active' 的判断，
       //     这是因为偶现当鼠标移入Bubble再选择文件后，
@@ -75,17 +76,17 @@ const Floater = ({
       // 鼠标进入头像区域，头像进入激活状态
       setStatus('active');
       eventbus.emit('FloaterActivated');
-      setIsAutoCloseDisabled(false); // 重新启用自动收起
+      isAutoCloseDisabled.current = false; // 重新启用自动收起
     }
   };
 
   const handleMouseLeaveFromAvatar = () => {
-    // console.log(`handleMouseLeaveFromAvatar:` + 
-    //   `isDragging: ${isDragging}, ` +
-    //   `isBubblePinned: ${isBubblePinned}, ` +
-    //   `isAutoCloseDisabled: ${isAutoCloseDisabled}`
-    // );
-    if (status !== 'hidden' && !isDragging && !isBubblePinned && !isAutoCloseDisabled) {
+    console.log(`[Floater] handleMouseLeaveFromAvatar: \n
+      isDragging: ${isDragging}, \n
+      isBubblePinned: ${isBubblePinned.current}, \n
+      isAutoCloseDisabled: ${isAutoCloseDisabled.current}`
+    );
+    if (status !== 'hidden' && !isDragging && !isBubblePinned.current && !isAutoCloseDisabled.current) {
       // 鼠标离开头像区域，如果Bubble没有定住且自动收起未被禁用，头像回到待命状态
       setStatus('standby');
       eventbus.emit('FloaterStandby');
@@ -99,23 +100,27 @@ const Floater = ({
   const handleMouseUpOnCloseFlag = (e) => {
     // 点击关闭，头像进入隐藏状态
     setStatus('hidden');
-    setIsBubblePinned(false); // 重置Bubble定住状态
+    isBubblePinned.current = false; // 重置Bubble定住状态
     eventbus.emit('FloaterHidden');
   };
 
   const handleStartDragAvatar = (e, data) => {
-    console.log('handleStartDragAvatar:', data);
+    console.log('[Floater] handleStartDragAvatar:', data);
     // 开始拖动，头像进入拖动状态
     setIsDragging(true);
-    setHasDragged(false); // 重置拖拽状态
+    hasDragged.current = { x: 0, y: 0 }; // 重置拖拽状态
   };
 
-  const handleDragAvatar = () => {
-    setHasDragged(true); // 如果发生了拖拽，设置状态为true
+  const handleDragAvatar = (e, data) => {
+    // 如果发生了拖拽，记录拖拽位移
+    hasDragged.current = {
+      x: hasDragged.current.x + Math.abs(data.deltaX),
+      y: hasDragged.current.y + Math.abs(data.deltaY),
+    };
   };
 
   const handleStopDragAvatar = (e, data) => {
-    console.log('handleStopDragAvatar:', data);
+    console.log('[Floater] handleStopDragAvatar:', data);
     // 停止拖动，头像退出拖动状态
     setIsDragging(false);
 
@@ -169,28 +174,33 @@ const Floater = ({
   };
 
   const handleAvatarClick = () => {
-    console.log(`handleAvatarClick: hasDragged: ${hasDragged}, status: ${status}, isBubblePinned: ${isBubblePinned}`);
-    if (!hasDragged) { // 只有在没有发生拖拽的情况下才触发点击事件
+    console.log(`[Floater] handleAvatarClick: \n
+      hasDragged: ${JSON.stringify(hasDragged.current)}, \n 
+      status: ${status}, \n
+      isBubblePinned: ${isBubblePinned.current} \n
+      isAutoCloseDisabled: ${isAutoCloseDisabled.current}`);
+    // 只有在没有发生拖拽的情况下才触发点击事件
+    if (hasDragged.current.x < 5 && hasDragged.current.y < 5) {
       if (status === 'active') {
         if (isBubblePinned) {
           // 如果Bubble已经定住，点击头像会收起Bubble
           setStatus('standby');
-          setIsBubblePinned(false);
+          isBubblePinned.current = false;
         } else {
           // 如果Bubble没有定住，点击头像会定住Bubble
-          setIsBubblePinned(true);
+          isBubblePinned.current = true;
         }
       } else if (status === 'standby') {
         // 如果是待命状态，点击头像会激活并定住Bubble
         setStatus('active');
-        setIsBubblePinned(true);
+        isBubblePinned.current = true;
       }
     }
-    setHasDragged(false); // 重置拖拽状态
+    hasDragged.current = { x: 0, y: 0 }; // 重置拖拽状态
   };
 
   const handleAvatarDoubleClick = () => {
-    console.log(`handleAvatarDoubleClick: status: ${status}, isDocking: ${isDocking}`);
+    console.log(`[Floater] handleAvatarDoubleClick: status: ${status}, isDocking: ${isDocking}`);
     // 双击头像，头像自动回到右侧边缘
     setPosition({ x: 0, y: usingInitY });
     setIsDocking(true);
@@ -203,23 +213,25 @@ const Floater = ({
 
   // 新增的处理函数
   const handleSummarize = () => {
-    console.log('Summarize page');
+    console.log('[Floater] Summarize page');
     // 在这里添加总结页面的逻辑
   };
 
-  const handleFileChange = (newFiles) => {
+  const handleFileChange = (newFiles, meow) => {
+    console.log(`[Floater] handleFileChange [${meow}]`);
     setSelectedFiles(newFiles);
-    setIsAutoCloseDisabled(true); // 禁用自动收起
+    isAutoCloseDisabled.current = true; // 禁用自动收起
   };
 
   const handleClickFileInput = () => {
-    setIsAutoCloseDisabled(true); // 禁用自动收起
+    console.log('[Floater] handleClickFileInput');
+    isAutoCloseDisabled.current = true; // 禁用自动收起
   };
 
   const handleRemoveFile = (index, removedFile, newFiles) => {
     setSelectedFiles(newFiles);
     // if (newFiles.length === 0) {
-    //   setIsAutoCloseDisabled(false); // 重新启用自动收起
+    //   isAutoCloseDisabled.current = false; // 重新启用自动收起
     // }
   };
 
@@ -229,7 +241,7 @@ const Floater = ({
 
   const handleSendMessage = (message) => {
     // 这里是发送消息的空函数
-    console.log('Sending message:', message);
+    console.log('[Floater] Sending message:', message);
   };
 
   return (
@@ -335,7 +347,7 @@ const Floater = ({
               >
                 <button
                   onClick={handleSummarize}
-                  className="text-xl bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-2xs"
+                  className="text-xl bg-blue-400 hover:bg-blue-500 text-white font-bold py-1 px-2 rounded-2xs"
                 >
                   总结本页
                 </button>
@@ -361,6 +373,7 @@ const Floater = ({
               <div className="text-left text-xl" style={{ color: "#34495e" }}>同时</div>
 
               <ChatInput
+                files={selectedFiles}
                 onTextChange={handleMessageChange}
                 onFileChange={handleFileChange}
                 onSend={handleSendMessage}
